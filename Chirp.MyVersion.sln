@@ -3,19 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Server", "Chirp.Server\Chirp.Server.csproj", "{82532FBA-52D8-44C6-AC31-C3734478B268}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chirp.Server", "Chirp.Server\Chirp.Server.csproj", "{82532FBA-52D8-44C6-AC31-C3734478B268}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Infrastructure", "Chirp.Infrastructure\Chirp.Infrastructure.csproj", "{19F2F301-0F4B-4D18-A7FC-C6351F1C6E5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chirp.Infrastructure", "Chirp.Infrastructure\Chirp.Infrastructure.csproj", "{19F2F301-0F4B-4D18-A7FC-C6351F1C6E5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Core", "Chirp.Core\Chirp.Core.csproj", "{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chirp.Core", "Chirp.Core\Chirp.Core.csproj", "{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{82532FBA-52D8-44C6-AC31-C3734478B268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +27,11 @@ Global
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {545DFF7C-BB36-4E27-B935-7142E1ECDF16}
 	EndGlobalSection
 EndGlobal

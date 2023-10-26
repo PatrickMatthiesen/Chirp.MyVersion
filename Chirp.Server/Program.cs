@@ -4,6 +4,7 @@ using Chirp.Infrastructure.Models;
 using Chirp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,27 @@ builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireCon
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = "GitHub";
+//})
+//    .AddCookie()
+//    .AddGitHub(o =>
+//    {
+//        o.ClientId = builder.Configuration["authentication:github:clientId"] ?? "1a2b3c4d5e6f7g8h9i0j";
+//        o.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? "1a2b3c4d5e6f7g8h9i0j1a2b3c4d5e6f7g8h9i0j";
+//        o.CallbackPath = "/signin-github";
+//    });
+
+builder.Services.AddAuthentication()
+    .AddGitHub(o =>
+    {
+        o.ClientId = builder.Configuration["authentication:github:clientId"];
+        o.ClientSecret = builder.Configuration["authentication:github:clientSecret"];
+        o.CallbackPath = "/signin-github";
+    });
 
 var app = builder.Build();
 

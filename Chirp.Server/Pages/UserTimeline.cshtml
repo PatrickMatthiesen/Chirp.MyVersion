@@ -1,16 +1,44 @@
 ﻿@page "/{author}"
-@using Chirp.Core.IRepository
 @inject ICheepRepository CheepRepository
+@inject UserManager<Author> UserManager
+
 @{
     ViewData["Title"] = "Chirp!";
     Layout = "Shared/_Layout";
+
+    var authorName = RouteData.Values["author"]?.ToString();
+
     var hasPage = int.TryParse(Request.Query["page"], out var page);
     page = Math.Max(hasPage ? page : 1, 1);
-    var cheeps = await CheepRepository.GetCheepsByAuthor(Request.RouteValues["author"].ToString(), page, 32);
+    var cheeps = await CheepRepository.GetCheepsByAuthor(authorName, page, 32);
+
+    @functions {
+        [BindProperty]
+        public string? Text { get; set; }
+
+        public async void OnPost() {
+            var user = await UserManager.GetUserAsync(User);
+            var cheep = new CheepDTO
+            {
+                Message = Text,
+                AuthorId = user.Id,
+                AuthorName = user.UserName
+            };
+            await CheepRepository.CreateCheep(cheep);
+        }
+    }
 }
 
 <div>
-    <h2> Public Timeline </h2>
+    <h2> @authorName's Timeline </h2>
+
+    @if (User.Identity!.IsAuthenticated && authorName == User.Identity.Name)
+    {
+        <form method="post">
+            <input type="text" name="text" placeholder="What do you want to cheep" />
+            <input type="submit" value="Cheep" />
+        </form>
+    }
 
     @if (cheeps.Count > 0)
     {

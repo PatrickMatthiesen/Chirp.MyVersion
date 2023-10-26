@@ -19,9 +19,9 @@ public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
                 AuthorName = c.Author.UserName,
             }).ToListAsync();
 
-    public async ValueTask<List<CheepDTO>> GetCheepsByAuthor(string authorId, int pageNumber, int pageSize) =>
+    public async ValueTask<List<CheepDTO>> GetCheepsByAuthor(string authorName, int pageNumber, int pageSize) =>
         await _context.Authors
-            .Where(a => a.Id == authorId)
+            .Where(a => a.UserName == authorName)
             .SelectMany(a => a.Cheeps)
             .OrderByDescending(c => c.TimeStamp)
             .Skip(pageNumber-1 * pageSize)
