@@ -1,25 +1,57 @@
 ﻿@page "/"
-@model Chirp.Server.Pages.PublicModel
+@using Chirp.Core.DTOs
+@using Chirp.Core.IRepository
+@using Chirp.Infrastructure.Models
+@using Microsoft.AspNetCore.Identity;
+@inject ICheepRepository CheepRepository
+@inject UserManager<Author> UserManager
+
 @{
     ViewData["Title"] = "Chirp!";
     Layout = "Shared/_Layout";
+    var hasPage = int.TryParse(Request.Query["page"], out var page);
+    page = Math.Max(hasPage ? page : 1, 1);
+    var cheeps = await CheepRepository.GetCheepByPage(page, 32);
+    @functions {
+        [BindProperty]
+        public string? Text { get; set; }
+
+        public async void OnPost() {
+            var user = await UserManager.GetUserAsync(User);
+            var cheep = new CheepDTO
+            {
+                Message = Text,
+                AuthorId = user.Id,
+                AuthorName = user.UserName
+            };
+            await CheepRepository.CreateCheep(cheep);
+        }
+    }
 }
 
 <div>
     <h2> Public Timeline </h2>
 
-    @if (Model.Cheeps.Any())
+    @if (User.Identity!.IsAuthenticated)
+    {
+        <form method="post">
+            <input type="text" name="text" placeholder="What do you want to cheep" />
+            <input type="submit" value="Cheep" />
+        </form>
+    }
+
+    @if (cheeps.Count > 0)
     {
         <ul id="messagelist" class="cheeps">
-            @foreach (var cheep in Model.Cheeps)
+            @foreach (var cheep in cheeps)
             {
                 <li>
                     <p>
                         <strong>
-                            <a href="/@cheep.Author">@cheep.Author</a>
+                            <a href="/@cheep.AuthorName">@cheep.AuthorName</a>
                         </strong>
                         @cheep.Message
-                        <small>&mdash; @cheep.Timestamp</small>
+                        <small>&mdash; @cheep.TimeStamp.ToLocalTime().ToString("dd MMM hh:mm:ss")</small>
                     </p>
                 </li>
             }

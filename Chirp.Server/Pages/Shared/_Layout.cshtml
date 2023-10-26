@@ -8,7 +8,10 @@
 <body>
 <div class=page>
     <h1><img src="/images/icon1.png" alt="Icon1"/>Chirp!</h1>
-
+    <div class=navigation>
+        <a href="/">public timeline</a> |
+        <partial name="_LoginPartial" />
+    </div>
     <div class=body>
         @RenderBody()
     </div>
@@ -18,4 +21,5 @@
 </div>
 
 </body>
+@await RenderSectionAsync("Scripts", required: false)
 </html>
