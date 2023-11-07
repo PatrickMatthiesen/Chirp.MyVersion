@@ -18,11 +18,10 @@
 
         public async Task OnPost() {
             var user = await UserManager.GetUserAsync(User);
-            var cheep = new CheepDTO
+            var cheep = new CheepCreateDTO
             {
                 Message = Text,
-                AuthorId = user.Id,
-                AuthorName = user.UserName
+                AuthorId = user.Id
             };
             await CheepRepository.CreateCheep(cheep);
         }
@@ -48,7 +47,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@cheep.AuthorName">@cheep.AuthorName</a>
+                            <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
                         </strong>
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp.ToLocalTime().ToString("dd MMM hh:mm:ss")</small>

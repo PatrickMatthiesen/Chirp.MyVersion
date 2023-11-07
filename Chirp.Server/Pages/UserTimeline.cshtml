@@ -12,17 +12,23 @@
     page = Math.Max(hasPage ? page : 1, 1);
     var cheeps = await CheepRepository.GetCheepsByAuthor(authorName, page, 32);
 
+    var displayName = cheeps.FirstOrDefault()?.DisplayName ?? authorName;
+    if (User.Identity.IsAuthenticated)
+    {
+        var user = await UserManager.GetUserAsync(User);
+        displayName = user?.DisplayName ?? user.UserName;
+    }
+
     @functions {
         [BindProperty]
         public string? Text { get; set; }
 
         public async Task OnPost() {
             var user = await UserManager.GetUserAsync(User);
-            var cheep = new CheepDTO
+            var cheep = new CheepCreateDTO
             {
                 Message = Text,
-                AuthorId = user.Id,
-                AuthorName = user.UserName
+                AuthorId = user.Id
             };
             await CheepRepository.CreateCheep(cheep);
         }
@@ -30,7 +36,7 @@
 }
 
 <div>
-    <h2> @authorName's Timeline </h2>
+    <h2> @displayName's Timeline </h2>
 
     @if (User.Identity!.IsAuthenticated && authorName == User.Identity.Name)
     {
@@ -48,7 +54,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@cheep.AuthorName">@cheep.AuthorName</a>
+                            <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
                         </strong>
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp.LocalDateTime.ToShortDateString()</small>

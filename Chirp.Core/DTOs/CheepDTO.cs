@@ -9,6 +9,11 @@ public record CheepDTO
 {
     public required string Message { get; set; }
     public DateTimeOffset TimeStamp { get; set; }
-    public required string AuthorId { get; set; }
     public required string AuthorName { get; set; }
+    public required string DisplayName { get; set; }
+}
+
+public record CheepCreateDTO {
+    public required string Message { get; set; }
+    public required string AuthorId { get; set; }
 }

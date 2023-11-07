@@ -13,12 +13,18 @@ public class ChirpDBContext : IdentityDbContext {
 
     }
 
-    //protected override void OnModelCreating(ModelBuilder modelBuilder) {
-    //    base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        base.OnModelCreating(modelBuilder);
 
-    //    modelBuilder
-    //        .Entity<Cheep>()
-    //        .Property(c => c.TimeStamp)
-    //        .HasConversion(new DateTimeOffsetToBinaryConverter());
-    //}
+        modelBuilder
+            .Entity<Author>()
+            .HasIndex(a => a.DisplayName)
+            .IsUnique();
+
+        modelBuilder
+            .Entity<Author>()
+            .Property(a => a.DisplayName)
+            .HasMaxLength(50)
+            .IsRequired();
+    }
 }

@@ -15,8 +15,8 @@ public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
             {
                 Message = c.Message,
                 TimeStamp = c.TimeStamp,
-                AuthorId = c.AuthorId,
-                AuthorName = c.Author.DisplayName ?? c.Author.UserName!,
+                AuthorName = c.Author.UserName!,
+                DisplayName = c.Author.DisplayName ?? c.Author.UserName!,
             }).ToListAsync();
 
     public async ValueTask<List<CheepDTO>> GetCheepsByAuthor(string authorName, int pageNumber, int pageSize) =>
@@ -30,11 +30,11 @@ public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
             {
                 Message = c.Message,
                 TimeStamp = c.TimeStamp,
-                AuthorId = c.AuthorId,
-                AuthorName = c.Author.DisplayName ?? c.Author.UserName!,
+                AuthorName = c.Author.UserName!,
+                DisplayName = c.Author.DisplayName ?? c.Author.UserName!,
             }).ToListAsync();
 
-    public async Task CreateCheep(CheepDTO cheepDTO) {
+    public async Task CreateCheep(CheepCreateDTO cheepDTO) {
         var author = await _context.Authors.Include(a => a.Cheeps).FirstOrDefaultAsync(a => a.Id == cheepDTO.AuthorId);
 
         if (author == null)
