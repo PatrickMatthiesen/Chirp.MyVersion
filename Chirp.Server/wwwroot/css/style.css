@@ -68,11 +68,22 @@ div.page div.navigation {
   color: #888;
   font-size: 12px;
   letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: row;
+  gap: 0.1rem;
 }
 
 div.page div.navigation a {
   color: #444;
   font-weight: bold;
+}
+
+.page .navigation .userAction:last-child {
+  margin-left: auto;
+  margin-right: 0.1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
 }
 
 div.page h2 {

@@ -16,7 +16,7 @@
         [BindProperty]
         public string? Text { get; set; }
 
-        public async void OnPost() {
+        public async Task OnPost() {
             var user = await UserManager.GetUserAsync(User);
             var cheep = new CheepDTO
             {

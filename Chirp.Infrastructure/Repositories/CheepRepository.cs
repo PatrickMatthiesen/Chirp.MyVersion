@@ -9,14 +9,14 @@ public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
     public async ValueTask<List<CheepDTO>> GetCheepByPage(int pageNumber, int pageSize) => 
         await _context.Cheeps
             .OrderByDescending(c => c.TimeStamp)
-            .Skip(pageNumber-1 * pageSize)
+            .Skip((pageNumber-1) * pageSize)
             .Take(pageSize)
             .Select(c => new CheepDTO
             {
                 Message = c.Message,
                 TimeStamp = c.TimeStamp,
                 AuthorId = c.AuthorId,
-                AuthorName = c.Author.UserName,
+                AuthorName = c.Author.DisplayName ?? c.Author.UserName!,
             }).ToListAsync();
 
     public async ValueTask<List<CheepDTO>> GetCheepsByAuthor(string authorName, int pageNumber, int pageSize) =>
@@ -24,14 +24,14 @@ public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
             .Where(a => a.UserName == authorName)
             .SelectMany(a => a.Cheeps)
             .OrderByDescending(c => c.TimeStamp)
-            .Skip(pageNumber-1 * pageSize)
+            .Skip((pageNumber-1) * pageSize)
             .Take(pageSize)
             .Select(c => new CheepDTO
             {
                 Message = c.Message,
                 TimeStamp = c.TimeStamp,
                 AuthorId = c.AuthorId,
-                AuthorName = c.Author.UserName!,
+                AuthorName = c.Author.DisplayName ?? c.Author.UserName!,
             }).ToListAsync();
 
     public async Task CreateCheep(CheepDTO cheepDTO) {
