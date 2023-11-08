@@ -17,6 +17,7 @@ builder.Services.AddDefaultIdentity<Author>(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 
 builder.Services.AddAuthentication()
     .AddGitHub(o =>

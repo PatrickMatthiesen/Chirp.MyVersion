@@ -2,8 +2,10 @@
 @using Chirp.Core.DTOs
 @using Chirp.Core.IRepository
 @using Chirp.Infrastructure.Models
+@using Chirp.Infrastructure.Repositories
 @using Microsoft.AspNetCore.Identity;
 @inject ICheepRepository CheepRepository
+@inject IAuthorRepository AuthorRepository
 @inject UserManager<Author> UserManager
 
 @{
@@ -11,7 +13,19 @@
     Layout = "Shared/_Layout";
     var hasPage = int.TryParse(Request.Query["page"], out var page);
     page = Math.Max(hasPage ? page : 1, 1);
-    var cheeps = await CheepRepository.GetCheepByPage(page, 32);
+
+    var hasSize = int.TryParse(Request.Query["size"], out var size);
+    size = Math.Max(hasSize ? size : 32, 32);
+
+    var cheeps = await CheepRepository.GetCheeps(page, 32);
+
+    List<FollowerDTO> followers = null;
+    if (User.Identity.IsAuthenticated)
+    {
+        var user = await UserManager.GetUserAsync(User);
+        followers = await AuthorRepository.GetFollowers(user.Id);
+    }
+
     @functions {
         [BindProperty]
         public string? Text { get; set; }
@@ -24,6 +38,17 @@
                 AuthorId = user.Id
             };
             await CheepRepository.CreateCheep(cheep);
+        }
+
+        public async Task OnPostFollow(string userToFollow) {
+            var user = await UserManager.GetUserAsync(User);
+            await AuthorRepository.FollowUser(user.Id, userToFollow);
+
+        }
+
+        public async Task OnPostUnFollow(string userToUnFollow) {
+            var user = await UserManager.GetUserAsync(User);
+            await AuthorRepository.UnfollowUser(user.Id, userToUnFollow);
         }
     }
 }
@@ -45,12 +70,29 @@
             @foreach (var cheep in cheeps)
             {
                 <li>
-                    <p>
+                    <div style="display: flex; gap: 0.3rem;">
                         <strong>
                             <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
                         </strong>
-                        @cheep.Message
                         <small>&mdash; @cheep.TimeStamp.ToLocalTime().ToString("dd MMM hh:mm:ss")</small>
+                        @if (User.Identity!.IsAuthenticated
+                        && cheep.AuthorName != User.Identity.Name
+                        && followers is not null)
+                        {
+                            <form method="post">
+                                @if (followers is not null && followers.Any(f => f.UserName == cheep.AuthorName))
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="UnFollow" asp-route-userToUnFollow="@cheep.AuthorName">UnFollow</button>
+                                }
+                                else
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="Follow" asp-route-userToFollow="@cheep.AuthorName">Follow</button>
+                                }
+                            </form>
+                        }
+                    </div>
+                    <p>
+                        @cheep.Message
                     </p>
                 </li>
             }

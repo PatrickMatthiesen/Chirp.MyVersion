@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Chirp.Infrastructure.Repositories;
 
 public class CheepRepository(ChirpDBContext _context) : ICheepRepository {
-    public async ValueTask<List<CheepDTO>> GetCheepByPage(int pageNumber, int pageSize) => 
+    public async ValueTask<List<CheepDTO>> GetCheeps(int pageNumber, int pageSize) => 
         await _context.Cheeps
             .OrderByDescending(c => c.TimeStamp)
             .Skip((pageNumber-1) * pageSize)

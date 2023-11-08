@@ -1,5 +1,6 @@
 ﻿@page "/{author}"
 @inject ICheepRepository CheepRepository
+@inject IAuthorRepository AuthorRepository
 @inject UserManager<Author> UserManager
 
 @{
@@ -10,20 +11,30 @@
 
     var hasPage = int.TryParse(Request.Query["page"], out var page);
     page = Math.Max(hasPage ? page : 1, 1);
-    var cheeps = await CheepRepository.GetCheepsByAuthor(authorName, page, 32);
 
-    var displayName = cheeps.FirstOrDefault()?.DisplayName ?? authorName;
-    if (User.Identity.IsAuthenticated)
+    var hasSize = int.TryParse(Request.Query["size"], out var size);
+    size = Math.Max(hasSize ? size : 32, 32);
+
+    List<CheepDTO> cheeps;
+    List<FollowerDTO> followers = null;
+    if (User.Identity.IsAuthenticated && authorName == User.Identity.Name)
     {
         var user = await UserManager.GetUserAsync(User);
-        displayName = user?.DisplayName ?? user.UserName;
+        followers = await AuthorRepository.GetFollowers(user.Id);
+        cheeps = await AuthorRepository.GetMyTimeline(user.Id, page, size);
+    } else
+    {
+        cheeps = await CheepRepository.GetCheepsByAuthor(authorName, page, size);
     }
+
+
+    var displayName = cheeps.FirstOrDefault()?.DisplayName ?? authorName;
 
     @functions {
         [BindProperty]
         public string? Text { get; set; }
 
-        public async Task OnPost() {
+        public async Task OnPostSendCheep() {
             var user = await UserManager.GetUserAsync(User);
             var cheep = new CheepCreateDTO
             {
@@ -31,6 +42,17 @@
                 AuthorId = user.Id
             };
             await CheepRepository.CreateCheep(cheep);
+        }
+
+        public async Task OnPostFollow(string userToFollow) {
+            var user = await UserManager.GetUserAsync(User);
+            await AuthorRepository.FollowUser(user.Id, userToFollow);
+
+        }
+
+        public async Task OnPostUnFollow(string userToUnFollow) {
+            var user = await UserManager.GetUserAsync(User);
+            await AuthorRepository.UnfollowUser(user.Id, userToUnFollow);
         }
     }
 }
@@ -40,7 +62,7 @@
 
     @if (User.Identity!.IsAuthenticated && authorName == User.Identity.Name)
     {
-        <form method="post">
+        <form method="post" asp-page-handler="SendCheep">
             <input type="text" name="text" placeholder="What do you want to cheep" />
             <input type="submit" value="Cheep" />
         </form>
@@ -52,12 +74,29 @@
             @foreach (var cheep in cheeps)
             {
                 <li>
-                    <p>
+                    <div style="display: flex; gap: 0.3rem;">
                         <strong>
                             <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
                         </strong>
+                        <small>&mdash; @cheep.TimeStamp.ToLocalTime().ToString("dd MMM hh:mm:ss")</small>
+                        @if (User.Identity!.IsAuthenticated
+                       && cheep.AuthorName != User.Identity.Name
+                       && followers is not null)
+                        {
+                            <form method="post">
+                                @if (followers is not null && followers.Any(f => f.UserName == cheep.AuthorName))
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="UnFollow" asp-route-userToUnFollow="@cheep.AuthorName">UnFollow</button>
+                                }
+                                else
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="Follow" asp-route-userToFollow="@cheep.AuthorName">Follow</button>
+                                }
+                            </form>
+                        }
+                    </div>
+                    <p>
                         @cheep.Message
-                        <small>&mdash; @cheep.TimeStamp.LocalDateTime.ToShortDateString()</small>
                     </p>
                 </li>
             }

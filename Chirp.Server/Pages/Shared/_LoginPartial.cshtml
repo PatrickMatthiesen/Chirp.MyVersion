@@ -10,7 +10,7 @@
     var user = await UserManager.GetUserAsync(User);
     var userName = user?.DisplayName ?? user.UserName;
     <div>
-            <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @userName!</a>
+        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @userName!</a>
     </div>
     <div>
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
