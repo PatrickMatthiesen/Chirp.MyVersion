@@ -26,5 +26,10 @@ public class ChirpDBContext : IdentityDbContext {
             .Property(a => a.DisplayName)
             .HasMaxLength(50)
             .IsRequired();
+
+        modelBuilder.Entity<Author>()
+            .HasMany(x => x.ExternalLogins)
+            .WithOne()
+            .HasForeignKey(x => x.UserId);
     }
 }

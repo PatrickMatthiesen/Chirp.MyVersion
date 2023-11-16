@@ -12,7 +12,7 @@ public class AuthorRepository(ChirpDBContext _context, ILogger<AuthorRepository>
         if (user is null)
         {
             _logger.LogError("User with id {id} not found.", id);
-            return new List<CheepDTO>(0);
+            return [];
         }
 
         var cheeps = await _context.Cheeps
@@ -26,6 +26,7 @@ public class AuthorRepository(ChirpDBContext _context, ILogger<AuthorRepository>
                 TimeStamp = x.TimeStamp,
                 AuthorName = x.Author.UserName,
                 DisplayName = x.Author.DisplayName ?? x.Author.UserName,
+                GithubId = x.Author.ExternalLogins.FirstOrDefault(l => l.LoginProvider == "GitHub").ProviderKey,
             })
             .ToListAsync();
 

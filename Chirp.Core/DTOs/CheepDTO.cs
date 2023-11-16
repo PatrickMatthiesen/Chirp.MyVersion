@@ -11,6 +11,7 @@ public record CheepDTO
     public DateTimeOffset TimeStamp { get; set; }
     public required string AuthorName { get; set; }
     public required string DisplayName { get; set; }
+    public string? GithubId { get; set; }
 }
 
 public record CheepCreateDTO {

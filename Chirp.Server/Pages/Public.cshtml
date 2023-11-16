@@ -70,6 +70,15 @@
             @foreach (var cheep in cheeps)
             {
                 <li>
+                    @if (cheep.GithubId is not null)
+                    {
+                        <img style="width:48px; height:48px" src="https://avatars.githubusercontent.com/u/@cheep.GithubId?v=4&size=48">
+                    }
+                    else
+                    {
+                        string name = cheep.AuthorName.Replace("@", string.Empty).Replace(".", string.Empty).ToLowerInvariant();
+                        <img style="width:48px; height:48px" src="https://www.gravatar.com/avatar/@(name).jpg?d=identicon&s=48">
+                    }
                     <div style="display: flex; gap: 0.3rem;">
                         <strong>
                             <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
