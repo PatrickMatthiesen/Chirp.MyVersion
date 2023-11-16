@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("azure");
+var connectionString = builder.Configuration.GetConnectionString("ChirpDB");
 builder.Services.AddDbContext<ChirpDBContext>(options =>
     options.UseSqlServer(connectionString));
 

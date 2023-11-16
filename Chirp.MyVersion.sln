@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chirp.Infrastructure", "Chi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chirp.Core", "Chirp.Core\Chirp.Core.csproj", "{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.UI.Tests", "Chirp.UI.Tests\Chirp.UI.Tests.csproj", "{D01242EE-E901-49C2-AC85-6A0DB60269F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{795FBCD1-6EF5-47C4-AF5B-95E0A15A07B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01242EE-E901-49C2-AC85-6A0DB60269F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01242EE-E901-49C2-AC85-6A0DB60269F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01242EE-E901-49C2-AC85-6A0DB60269F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01242EE-E901-49C2-AC85-6A0DB60269F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
