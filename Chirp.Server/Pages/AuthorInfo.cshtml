@@ -1,0 +1,150 @@
+﻿@page "/me"
+@inject IAuthorRepository AuthorRepository
+@inject ICheepRepository CheepRepository
+@inject UserManager<Author> UserManager
+@inject SignInManager<Author> SignInManager
+
+@{
+    ViewData["Title"] = "About Me";
+    Layout = "Shared/_Layout";
+
+    var author = await UserManager.GetUserAsync(User);
+
+    var authorDetails = await AuthorRepository.GetAuthorDetails(author.Id);
+    var followers = await AuthorRepository.GetFollowers(author.Id);
+    var cheeps = await CheepRepository.GetCheepsByAuthor(author.UserName, 1, 32);
+    @functions {
+        public async Task OnPostDownloadData(string userToFollow) {
+            var user = await UserManager.GetUserAsync(User);
+            // await AuthorRepository.DownloadData(user.Id, userToFollow);
+            // idk man figure something out for yourself man :P
+        }
+
+        public async Task<IActionResult> OnPostDeleteAccount() {
+            var user = await UserManager.GetUserAsync(User);
+            var success = await AuthorRepository.DeleteAuthor(user.Id);
+            if (success) {
+                await SignInManager.SignOutAsync();
+                return Redirect("/");
+            }
+            return Page();
+        }
+    }
+}
+
+<div>
+    <h2>All About @authorDetails.DisplayName</h2>
+
+    <div>
+        <h3>Details</h3>
+        <ul>
+            <li>
+                <strong>Display Name:</strong> @authorDetails.DisplayName
+            </li>
+            <li>
+                <strong>Email:</strong> @authorDetails.Email
+            </li>
+            <li>
+                <strong>UserName:</strong> @authorDetails.UserName
+            </li>
+            <li>
+                <strong>Follows:</strong> @followers.Count
+            </li>
+            <li>
+                <strong>Cheeps:</strong> @cheeps.Count
+            </li>
+            @if (author.ExternalLogins.Any())
+            {
+                <li>
+                    <strong>External Logins:</strong>
+                    <ul>
+                        @foreach (var login in author.ExternalLogins)
+                        {
+                            <li>
+                                <strong>@login.LoginProvider</strong> - @login.ProviderKey
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+
+    <div>
+        <h3>You Follow</h3>
+        @if (followers.Count == 0)
+        {
+            <em>You don't follow anyone yet.</em>
+        }
+        <ul>
+            @foreach (var follower in followers)
+            {
+                <li>
+                    <a href="/@follower.UserName">@follower.DisplayName</a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    @if (cheeps.Count > 0)
+    {
+        <h3>Your Cheeps</h3>
+        <ul id="messagelist" class="cheeps">
+            @foreach (var cheep in cheeps)
+            {
+                <li>
+                    @if (cheep.GithubId is not null)
+                    {
+                        <img style="width:48px; height:48px" src="https://avatars.githubusercontent.com/u/@cheep.GithubId?v=4&size=48">
+                    }
+                    else
+                    {
+                        string name = cheep.AuthorName.Replace("@", string.Empty).Replace(".", string.Empty).ToLowerInvariant();
+                        <img style="width:48px; height:48px" src="https://www.gravatar.com/avatar/@(name).jpg?d=identicon&s=48">
+                    }
+                    <div style="display: flex; gap: 0.3rem;">
+                        <strong>
+                            <a href="/@cheep.AuthorName">@cheep.DisplayName</a>
+                        </strong>
+                        <small>&mdash; @cheep.TimeStamp.ToLocalTime().ToString("dd MMM hh:mm:ss")</small>
+                        @if (User.Identity!.IsAuthenticated
+                       && cheep.AuthorName != User.Identity.Name
+                       && followers is not null)
+                        {
+                            <form method="post">
+                                @if (followers is not null && followers.Any(f => f.UserName == cheep.AuthorName))
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="UnFollow" asp-route-userToUnFollow="@cheep.AuthorName">UnFollow</button>
+                                }
+                                else
+                                {
+                                    <button class="btn-follow" type="submit" asp-page-handler="Follow" asp-route-userToFollow="@cheep.AuthorName">Follow</button>
+                                }
+                            </form>
+                        }
+                    </div>
+                    <p>
+                        @cheep.Message
+                    </p>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <em>There are no cheeps so far.</em>
+    }
+
+    <div>
+        <h3>Download Data</h3>
+        <form method="post" asp-page-handler="DownloadData">
+            <input type="submit" value="Download Data" />
+        </form>
+    </div>
+    <div>
+        <h3>Delete all data and remove account</h3>
+        <form method="post" asp-page-handler="DeleteAccount">
+            <input type="submit" value="Delete Account" />
+        </form>
+    </div>
+        
+</div>

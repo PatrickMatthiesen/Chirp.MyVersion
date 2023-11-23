@@ -6,6 +6,30 @@ using Microsoft.Extensions.Logging;
 namespace Chirp.Infrastructure.Repositories;
 public class AuthorRepository(ChirpDBContext _context, ILogger<AuthorRepository> _logger) : IAuthorRepository {
 
+    public async ValueTask<AuthorDetailsDTO> GetAuthorDetails(string id) {
+        var user = await _context.Authors
+            .Include(a => a.ExternalLogins)
+            .Include(a => a.Followers)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user is null)
+        {
+            _logger.LogError("User with id {id} not found.", id);
+            return null;
+        }
+
+        var authorDetails = new AuthorDetailsDTO
+        {
+            DisplayName = user.DisplayName ?? user.UserName,
+            Email = user.Email,
+            UserName = user.UserName,
+            ExternalProvider = user.ExternalLogins.FirstOrDefault()?.LoginProvider ?? string.Empty,
+            ExternalId = user.ExternalLogins.FirstOrDefault()?.ProviderKey ?? string.Empty,
+        };
+
+        return authorDetails;
+    }
+
     public async ValueTask<List<CheepDTO>> GetMyTimeline(string id, int pageNumber, int pageSize) {
         var user = await _context.Authors.Include(u => u.Followers).FirstOrDefaultAsync(u => u.Id == id);
 
@@ -81,5 +105,29 @@ public class AuthorRepository(ChirpDBContext _context, ILogger<AuthorRepository>
 
         await _context.SaveChangesAsync();
         return (true, "");
+    }
+
+    public async ValueTask<bool> DeleteAuthor(string id) {
+        var user = await _context.Authors
+            .Include(u => u.ExternalLogins)
+            .Include(u => u.Following)
+            .Include(u => u.Followers)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user is null)
+        {
+            _logger.LogError("User with id {id} not found.", id);
+            return false;
+        }
+
+        _logger.LogInformation("Deleting user with id {id}", id);
+
+        user.Followers.Clear();
+        user.Following.Clear();
+
+        _context.Authors.Remove(user);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }
